@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,5 +34,19 @@ public class UserServiceImpl implements UserService {
                 .id(userSaved.getId())
                 .name(userSaved.getName())
                 .build();
+    }
+
+    @Override
+    public List<UserResponseDto> getUsers() {
+        List<MUser> users = userRepository.findAll();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        users.forEach(user -> {
+            UserResponseDto userResponseDto = UserResponseDto.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .build();
+            userResponseDtos.add(userResponseDto);
+        });
+        return userResponseDtos;
     }
 }
