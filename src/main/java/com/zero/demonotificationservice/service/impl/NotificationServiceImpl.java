@@ -13,6 +13,7 @@ import jdk.dynalink.linker.GuardedInvocationTransformer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,8 @@ import java.util.*;
 @Slf4j
 public class NotificationServiceImpl implements NotificationService {
 
-    private NotificationRepository notificationRepository;
-    private UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
     @Override
     public NotificationResponseDto create(NotificationRequestDto requestDto) {
@@ -53,7 +54,9 @@ public class NotificationServiceImpl implements NotificationService {
             throw new BusinessException(GlobalMessage.UUID_NOT_VALID);
         }
         MUser user = findById(uuidUserId);
-        List<MNotification> notifications = notificationRepository.findAll(searchByUser(user));
+        List<MNotification> notifications = notificationRepository.findAll(
+                searchByUser(user), Sort.by("createdAt").descending()
+        );
         List<NotificationResponseDto> notificationResponseDtos = new ArrayList<>();
         notifications.forEach(notification -> {
             NotificationResponseDto notificationResponseDto = NotificationResponseDto.builder()

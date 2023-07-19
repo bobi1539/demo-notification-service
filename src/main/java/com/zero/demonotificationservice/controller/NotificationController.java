@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class NotificationController {
 
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @PostMapping
     public NotificationResponseDto create(@RequestBody NotificationRequestDto requestDto) {

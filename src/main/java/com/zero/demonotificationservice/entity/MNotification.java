@@ -34,10 +34,15 @@ public class MNotification {
     @JoinColumn(name = COLUMN_USER_ID)
     private MUser user;
 
+    @ManyToOne
+    @JoinColumn(name = COLUMN_CATEGORY_ID)
+    private MCategory category;
+
     public static final String TABLE_NAME = "m_notification";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_DETAIL = "detail";
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_USER_ID = "user_id";
+    public static final String COLUMN_CATEGORY_ID = "category_id";
 }

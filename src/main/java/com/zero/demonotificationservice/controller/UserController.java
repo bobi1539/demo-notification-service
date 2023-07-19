@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/users")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping
     public UserResponseDto create(@RequestBody UserRequestDto requestDto) {
