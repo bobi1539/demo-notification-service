@@ -13,4 +13,5 @@ public class NotificationRequestDto {
     private String title;
     private String detail;
     private UUID userId;
+    private Integer categoryId;
 }

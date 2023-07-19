@@ -32,19 +32,29 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationResponseDto create(NotificationRequestDto requestDto) {
-        MUser user = findById(requestDto.getUserId());
+        MUser user = findUserBy(requestDto.getUserId());
+        MCategory category = findCategoryBy(requestDto.getCategoryId());
+
         MNotification notification = MNotification.builder()
                 .title(requestDto.getTitle())
                 .detail(requestDto.getDetail())
                 .user(user)
+                .category(category)
                 .build();
         MNotification notificationSaved = notificationRepository.save(notification);
+
+        CategoryResponseDto categoryResponseDto = CategoryResponseDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+
         return NotificationResponseDto.builder()
                 .id(notificationSaved.getId())
                 .title(notificationSaved.getTitle())
                 .detail(notificationSaved.getDetail())
                 .createdAt(notificationSaved.getCreatedAt())
                 .userId(requestDto.getUserId())
+                .category(categoryResponseDto)
                 .build();
     }
 
@@ -56,7 +66,7 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             throw new BusinessException(GlobalMessage.UUID_NOT_VALID);
         }
-        MUser user = findById(uuidUserId);
+        MUser user = findUserBy(uuidUserId);
         List<MNotification> notifications = notificationRepository.findAll(
                 searchBy(user, categoryId), Sort.by("createdAt").descending()
         );
@@ -85,13 +95,20 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationResponseDtos;
     }
 
-    private MUser findById(UUID userId) {
+    private MUser findUserBy(UUID userId) {
         if (Objects.isNull(userId)) {
             return null;
         }
         return userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(GlobalMessage.NOT_FOUND)
         );
+    }
+
+    private MCategory findCategoryBy(Integer categoryId) {
+        if (Objects.isNull(categoryId)) {
+            throw new BusinessException(GlobalMessage.NOT_FOUND);
+        }
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessException(GlobalMessage.NOT_FOUND));
     }
 
     private UUID getUserIdFromNotification(MNotification notification) {
