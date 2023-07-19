@@ -16,4 +16,5 @@ public class NotificationResponseDto {
     private String detail;
     private Timestamp createdAt;
     private UUID userId;
+    private CategoryResponseDto category;
 }

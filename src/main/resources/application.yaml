@@ -5,7 +5,7 @@ spring:
     password: password@147
     url: jdbc:postgresql://localhost:5432/demo-notification-service
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: update
     properties:

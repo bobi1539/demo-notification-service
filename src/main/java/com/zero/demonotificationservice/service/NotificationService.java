@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface NotificationService {
     NotificationResponseDto create(NotificationRequestDto requestDto);
-    List<NotificationResponseDto> getNotifications(String userId);
+
+    List<NotificationResponseDto> getNotifications(String userId, Integer categoryId);
 }

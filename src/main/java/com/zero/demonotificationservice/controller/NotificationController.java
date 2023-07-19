@@ -28,7 +28,14 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<NotificationResponseDto> getNotifications(@RequestParam String userId) {
-        return notificationService.getNotifications(userId);
+    public List<NotificationResponseDto> getNotifications(
+            @RequestParam String userId,
+            @RequestParam(required = false) Integer categoryId
+    ) {
+        long start = System.currentTimeMillis();
+        List<NotificationResponseDto> notificationResponseDtos = notificationService.getNotifications(userId, categoryId);
+        long end = System.currentTimeMillis();
+        log.info("duration : {} ms", end - start);
+        return notificationResponseDtos;
     }
 }
