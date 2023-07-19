@@ -6,10 +6,9 @@ import com.zero.demonotificationservice.service.NotificationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/notifications")
@@ -24,7 +23,12 @@ public class NotificationController {
         long start = System.currentTimeMillis();
         NotificationResponseDto notificationResponseDto = notificationService.create(requestDto);
         long end = System.currentTimeMillis();
-        log.info("duration : {}", end - start);
+        log.info("duration : {} ms", end - start);
         return notificationResponseDto;
+    }
+
+    @GetMapping
+    public List<NotificationResponseDto> getNotifications(@RequestParam String userId) {
+        return notificationService.getNotifications(userId);
     }
 }

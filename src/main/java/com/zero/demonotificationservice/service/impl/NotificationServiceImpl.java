@@ -9,14 +9,14 @@ import com.zero.demonotificationservice.repository.NotificationRepository;
 import com.zero.demonotificationservice.repository.UserRepository;
 import com.zero.demonotificationservice.service.NotificationService;
 import com.zero.demonotificationservice.util.BusinessException;
+import jdk.dynalink.linker.GuardedInvocationTransformer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -44,12 +44,55 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
     }
 
-    public MUser findById(UUID userId) {
+    @Override
+    public List<NotificationResponseDto> getNotifications(String userId) {
+        UUID uuidUserId = null;
+        try {
+            uuidUserId = UUID.fromString(userId);
+        } catch (Exception e) {
+            throw new BusinessException(GlobalMessage.UUID_NOT_VALID);
+        }
+        MUser user = findById(uuidUserId);
+        List<MNotification> notifications = notificationRepository.findAll(searchByUser(user));
+        List<NotificationResponseDto> notificationResponseDtos = new ArrayList<>();
+        notifications.forEach(notification -> {
+            NotificationResponseDto notificationResponseDto = NotificationResponseDto.builder()
+                    .id(notification.getId())
+                    .title(notification.getTitle())
+                    .detail(notification.getDetail())
+                    .createdAt(notification.getCreatedAt())
+                    .userId(getUserIdFromNotification(notification))
+                    .build();
+            notificationResponseDtos.add(notificationResponseDto);
+        });
+        return notificationResponseDtos;
+    }
+
+    private MUser findById(UUID userId) {
         if (Objects.isNull(userId)) {
             return null;
         }
         return userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(GlobalMessage.NOT_FOUND)
         );
+    }
+
+    private UUID getUserIdFromNotification(MNotification notification) {
+        if (Objects.isNull(notification.getUser())) {
+            return null;
+        }
+        return notification.getUser().getId();
+    }
+
+    private Specification<MNotification> searchByUser(MUser user) {
+        Specification<MNotification> specification = (root, query, criteriaBuilder) -> {
+            if (user == null) {
+                return null;
+            }
+            return criteriaBuilder.equal(root.get("user"), user);
+        };
+        return specification.or(((root, query, criteriaBuilder) -> {
+            return criteriaBuilder.isNull(root.get("user"));
+        }));
     }
 }
